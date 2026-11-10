@@ -94,12 +94,19 @@ def normalize_payload(raw: dict[str, Any]) -> dict[str, Any]:
     if missing:
         raise ValueError(f"Missing required telemetry field(s): {', '.join(missing)}")
 
-    return {
+    payload = {
         "coffeeLotId": int(raw["coffeeLotId"]),
         "temperature": float(raw["temperature"]),
         "humidity": float(raw["humidity"]),
         "timestamp": to_backend_timestamp(raw["timestamp"]),
     }
+    if "sensorId" in raw and raw["sensorId"]:
+        payload["sensorId"] = str(raw["sensorId"])
+    if "sequence" in raw and raw["sequence"] is not None:
+        payload["sequence"] = int(raw["sequence"])
+    if "measuredAt" in raw and raw["measuredAt"]:
+        payload["measuredAt"] = to_backend_timestamp(raw["measuredAt"])
+    return payload
 
 
 class TelemetryBridge:
